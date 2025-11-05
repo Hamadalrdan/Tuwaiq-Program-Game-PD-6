@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 71345b76085769944aa6fd7b784379ec
+timeCreated: 1468302254
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 67045
+  packageName: True Horror - Dummy
+  packageVersion: 1.0
+  assetPath: Assets/True_Horror/True_Dummy/Example_Map/Materials/wall_diffuse.mat
+  uploadId: 126832

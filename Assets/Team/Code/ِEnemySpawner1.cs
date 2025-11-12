@@ -1,31 +1,31 @@
-using JetBrains.Annotations;
 using System.Collections;
 using UnityEngine;
 
 public class EnemySpawner1 : MonoBehaviour
 {
-    public GameObject EnemyPrefap;
+    public GameObject enemyPrefab;     // اسحب prefab العدو هنا
+    public int maxEnemies = 6;
+    public string enemyTag = "Enemy";
+    public float firstDelay = 1.5f;
+    public float every = 2f;
 
-    void Start()
+    void Start() => StartCoroutine(Loop());
+
+    IEnumerator Loop()
     {
-        StartCoroutine(SpawnEnemy());
-    }
+        yield return new WaitForSeconds(firstDelay);
 
-    public IEnumerator SpawnEnemy()
-    {
-        yield return new WaitForSeconds(.8f);
+        while (true)
+        {
+            int alive = GameObject.FindGameObjectsWithTag(enemyTag).Length;
+            if (alive < maxEnemies)
+            {
+                Vector3 p = transform.position;
+                p.x += Random.Range(-5f, 5f);
+                Instantiate(enemyPrefab, p, transform.rotation);
+            }
 
-        // 👇 نأخذ موقع السباونر
-        Vector3 spawnPos = transform.position;
-
-        // 👈 نخلي الـ X عشوائي بين -3 و +3
-        spawnPos.x += Random.Range(-5f, 5f);
-
-        // 👈 لو تبي العشوائية على Z بدل X، استخدم:
-        // spawnPos.z += Random.Range(-3f, 3f);
-
-        Instantiate(EnemyPrefap, spawnPos, EnemyPrefap.transform.rotation, null);
-
-        StartCoroutine(SpawnEnemy());
+            yield return new WaitForSeconds(every);
+        }
     }
 }

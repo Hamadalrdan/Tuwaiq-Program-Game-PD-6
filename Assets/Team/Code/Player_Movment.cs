@@ -4,12 +4,12 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(CharacterController))]
 public class Player_Movment : MonoBehaviour
 {
-    // ---------------- UI Lose ----------------
+    // ==================== UI Lose ====================
     [Header("Lose UI")]
-    [SerializeField] private GameObject losePanel;      // اسحب LosePanel هنا أو عطهِ Tag وخلّه فاضي
-    [SerializeField] private string enemyTag = "Enemy"; // تأكد العدو بهذا التاق
+    [SerializeField] private GameObject losePanel;
+    [SerializeField] private string enemyTag = "Enemy";
 
-    // ---------------- Movement ----------------
+    // ==================== Movement ====================
     [Header("Movement")]
     public float moveSpeed = 5f;
     public float gravity = 9.81f;
@@ -18,31 +18,36 @@ public class Player_Movment : MonoBehaviour
     private CharacterController cc;
     private float yVel;
 
-    // ---------------- Health/Death ----------------
+    // ==================== Health/Death ====================
     [Header("Health")]
     public int maxHealth = 5;
     public int currentHealth;
 
     [Header("Death")]
-    public float deathDelay = 2f;     // ما نستخدمه الآن؛ نخليها احتياط لو تبي تأخير قبل الإيقاف
+    public float deathDelay = 2f;
     private bool isDead = false;
 
-    // ---------------- Hit reaction ----------------
+    // ==================== Hit reaction ====================
     [Header("Hit Reaction")]
     public float hitStunTime = 0.25f;
     public float knockbackForce = 6f;
     public float knockbackDamping = 6f;
 
+    // يمنع تعدد الضربات في نفس اللحظة
+    [Tooltip("وقت عدم القابلية للضرر بعد الضربة (ثانية)")]
+    public float invulnerableAfterHit = 0.25f;
+    private float lastHitTime = -999f;
+
     private float hitStunTimer = 0f;
     private Vector3 externalVelocity = Vector3.zero;
 
-    // ---------------- VFX/SFX ----------------
+    // ==================== VFX/SFX ====================
     [Header("VFX/SFX (Optional)")]
     public AudioSource sfx;
     public AudioClip hitSfx;
     public AudioClip deathSfx;
 
-    // ---------------- Flashlight ----------------
+    // ==================== Flashlight ====================
     [Header("Flashlight")]
     public Transform flashlightSocket;
     public GameObject flashlightObject;
@@ -52,8 +57,19 @@ public class Player_Movment : MonoBehaviour
     public KeyCode flashlightToggleKey = KeyCode.F;
     public bool flashlightStartsOn = true;
 
-    private Light flashlightLight;   // cached (created if missing)
+    private Light flashlightLight;
     private bool flashlightOn;
+
+    // ==================== Animator ====================
+    [Header("Animator")]
+    public Animator anim;
+
+    private static readonly int SpeedHash    = Animator.StringToHash("Speed");
+    private static readonly int IsMovingHash = Animator.StringToHash("IsMoving");
+    private static readonly int HitHash      = Animator.StringToHash("Hit");
+    private static readonly int DieHash      = Animator.StringToHash("Die");
+
+    private bool hasSpeed, hasIsMoving, hasHit, hasDie;
 
     void Awake()
     {
@@ -63,7 +79,6 @@ public class Player_Movment : MonoBehaviour
         // حضّر لوحة الخسارة
         if (losePanel == null)
         {
-            // جرّب إيجادها بالتاق لو حاط Tag = LosePanelUI
             var byTag = GameObject.FindGameObjectWithTag("LosePanelUI");
             if (byTag) losePanel = byTag;
             else losePanel = GameObject.Find("LosePanel");
@@ -71,13 +86,18 @@ public class Player_Movment : MonoBehaviour
         if (losePanel) losePanel.SetActive(false);
         Time.timeScale = 1f;
 
-        // --- Setup flashlight parenting and cache/create light ---
+        // Animator
+        if (anim == null) anim = GetComponent<Animator>();
+        if (anim) anim.applyRootMotion = false;
+        CacheAnimatorParams();
+
+        // إعداد المصباح
         if (flashlightObject != null && flashlightSocket != null)
         {
             if (flashlightObject.transform.parent != flashlightSocket)
-                flashlightObject.transform.SetParent(flashlightSocket, worldPositionStays: false);
+                flashlightObject.transform.SetParent(flashlightSocket, false);
 
-            AlignFlashlightTransform(); // apply offsets
+            AlignFlashlightTransform();
 
             flashlightLight = flashlightObject.GetComponentInChildren<Light>();
             if (flashlightLight == null)
@@ -108,6 +128,7 @@ public class Player_Movment : MonoBehaviour
         if (hitStunTimer > 0f) hitStunTimer -= Time.deltaTime;
 
         bool canControl = !isDead && hitStunTimer <= 0f;
+
         float x = 0f, z = 0f;
         if (canControl)
         {
@@ -122,7 +143,8 @@ public class Player_Movment : MonoBehaviour
         if (cc.isGrounded)
         {
             yVel = -0.5f;
-            if (canControl && Input.GetKeyDown(KeyCode.Space)) yVel = jumpForce;
+            if (canControl && Input.GetKeyDown(KeyCode.Space))
+                yVel = jumpForce;
         }
         else
         {
@@ -136,21 +158,32 @@ public class Player_Movment : MonoBehaviour
         move.y = yVel;
         cc.Move(move * Time.deltaTime);
 
+        if (anim != null)
+        {
+            float groundSpeed = (canControl ? new Vector2(inputMove.x, inputMove.z).magnitude : 0f);
+            float speed01 = Mathf.Clamp01(groundSpeed / Mathf.Max(0.01f, moveSpeed));
+
+            if (hasSpeed)    anim.SetFloat(SpeedHash, speed01);
+            if (hasIsMoving) anim.SetBool(IsMovingHash, speed01 > 0.05f);
+        }
+
         HandleFlashlight(canControl);
     }
 
-    // ---------------- Damage/Death ----------------
+    // ==================== Damage/Death ====================
     public void TakeDamage(int amount) => TakeDamage(amount, transform.position - transform.forward * 0.1f);
 
     public void TakeDamage(int amount, Vector3 hitFromWorldPos)
     {
         if (isDead) return;
+        if (Time.time - lastHitTime < invulnerableAfterHit) return; // حماية من الضرب المكرر
+        lastHitTime = Time.time;
 
         currentHealth = Mathf.Max(0, currentHealth - amount);
-        if (sfx && hitSfx) sfx.PlayOneShot(hitSfx);
-        GetComponent<Animator>()?.SetTrigger("Hit");
 
-        // Knockback
+        if (sfx && hitSfx) sfx.PlayOneShot(hitSfx);
+        if (anim && hasHit) anim.SetTrigger(HitHash);
+
         hitStunTimer = hitStunTime;
         Vector3 dir = (transform.position - hitFromWorldPos);
         dir.y = 0f;
@@ -169,16 +202,14 @@ public class Player_Movment : MonoBehaviour
         externalVelocity = Vector3.zero;
         yVel = 0f;
 
-        GetComponent<Animator>()?.SetTrigger("Die");
+        if (anim && hasDie) anim.SetTrigger(DieHash);
         if (sfx && deathSfx) sfx.PlayOneShot(deathSfx);
 
-        // ⛔ بدلاً من إعادة تحميل المشهد: أظهر شاشة الخسارة وأوقف الزمن
         if (losePanel) losePanel.SetActive(true);
         Time.timeScale = 0f;
         Debug.Log("[Lose] YOU LOST");
     }
 
-    // لو تحتاج إعادة المشهد لاحقًا بزر (Restart) استدعِ هذا
     public void RestartScene()
     {
         Time.timeScale = 1f;
@@ -186,26 +217,48 @@ public class Player_Movment : MonoBehaviour
         SceneManager.LoadScene(scene.buildIndex);
     }
 
-    // ---------------- Collision hooks (تأذي اللاعب عند لمس العدو) ----------------
+    // ==================== Enemy Hit (Player-side) ====================
     void OnTriggerEnter(Collider other)
     {
-        if (!isDead && other.CompareTag(enemyTag))
+        if (isDead) return;
+        if (!other || !other.gameObject.activeInHierarchy) return;
+
+        if (other.CompareTag(enemyTag))
+        {
             TakeDamage(1, other.transform.position);
+            Destroy(GetEnemyRoot(other.transform));
+        }
     }
 
-    void OnCollisionEnter(Collision other)
+    void OnCollisionEnter(Collision collision)
     {
-        if (!isDead && other.collider.CompareTag(enemyTag))
-            TakeDamage(1, other.transform.position);
+        if (isDead) return;
+        if (collision == null || collision.collider == null) return;
+
+        if (collision.collider.CompareTag(enemyTag))
+        {
+            TakeDamage(1, collision.collider.transform.position);
+            Destroy(GetEnemyRoot(collision.collider.transform));
+        }
     }
 
-    void OnControllerColliderHit(ControllerColliderHit hit)
+    // يبحث عن الجذر الحقيقي للعدو (لو الكوليدر كان ابن داخل البريفاب)
+    private GameObject GetEnemyRoot(Transform t)
     {
-        if (!isDead && hit.collider != null && hit.collider.CompareTag(enemyTag))
-            TakeDamage(1, hit.collider.transform.position);
+        Transform cur = t;
+        while (cur.parent != null)
+        {
+            if (cur.CompareTag(enemyTag)) return cur.gameObject;
+            // لو ما فيه تاق، نوقف عند أول كائن عليه سكربت العدو
+            if (cur.GetComponent<MonoBehaviour>() && cur.name.ToLower().Contains("enemy"))
+                return cur.gameObject;
+            cur = cur.parent;
+        }
+        // آخر محاولة: ارجع لأعلى جذر
+        return t.root.gameObject;
     }
 
-    // ---------------- Flashlight helpers ----------------
+    // ==================== Flashlight helpers ====================
     private void HandleFlashlight(bool canControl)
     {
         if (flashlightObject == null || flashlightSocket == null) return;
@@ -246,8 +299,24 @@ public class Player_Movment : MonoBehaviour
 
     private void SetFlashlightActive(bool enable)
     {
-        // إذا تبي الجسم يظل ظاهر ويطفي الضوء فقط، علّق السطر الأول وخلي الثاني فقط
         flashlightObject.SetActive(enable);
         if (flashlightLight) flashlightLight.enabled = enable;
+    }
+
+    private void CacheAnimatorParams()
+    {
+        hasSpeed = hasIsMoving = hasHit = hasDie = false;
+        if (anim == null) return;
+
+        foreach (var p in anim.parameters)
+        {
+            if (p.type == AnimatorControllerParameterType.Float   && p.nameHash == SpeedHash)    hasSpeed = true;
+            if (p.type == AnimatorControllerParameterType.Bool    && p.nameHash == IsMovingHash) hasIsMoving = true;
+            if (p.type == AnimatorControllerParameterType.Trigger && p.nameHash == HitHash)      hasHit = true;
+            if (p.type == AnimatorControllerParameterType.Trigger && p.nameHash == DieHash)      hasDie = true;
+        }
+
+        if (!hasSpeed)
+            Debug.LogWarning("[Animator] Missing parameter Float 'Speed' (مهم لانتقالات Idle/Walking).");
     }
 }

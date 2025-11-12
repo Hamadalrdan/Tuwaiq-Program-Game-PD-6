@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class ChestAutoOpen : MonoBehaviour
 {
-    public Animator chestAnimator; 
-    public GameObject snake;
+    public GameObject chestClosed;   // اسحب chest_close
+    public GameObject chestOpen;     // اسحب chest_open (غير مفعّل)
     bool opened = false;
 
     private void OnTriggerEnter(Collider other)
@@ -12,13 +12,7 @@ public class ChestAutoOpen : MonoBehaviour
         if (!other.CompareTag("Player")) return;
 
         opened = true;
-
-        // يشغل أنيميشن فتح الصندوق
-        if (chestAnimator != null)
-            chestAnimator.SetTrigger("Open");
-
-        // يطلع الثعبان
-        if (snake != null)
-            snake.SetActive(true);
+        if (chestClosed) chestClosed.SetActive(false);
+        if (chestOpen)   chestOpen.SetActive(true);
     }
 }

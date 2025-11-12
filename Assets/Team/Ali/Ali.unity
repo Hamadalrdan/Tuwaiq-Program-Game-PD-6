@@ -243,8 +243,8 @@ MonoBehaviour:
   enemyPrefab: {fileID: 1724645169510910789, guid: 831adc7ec14394f1e8f0a0ce91e30514, type: 3}
   maxEnemies: 6
   enemyTag: Enemy
-  firstDelay: 1.5
-  every: 2
+  firstDelay: 6
+  every: 1000
 --- !u!1 &453909326
 GameObject:
   m_ObjectHideFlags: 0
@@ -936,8 +936,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 15, y: 0.76, z: 60}
-  m_Center: {x: 10.4, y: -15, z: 34}
+  m_Size: {x: 16, y: 2, z: 60}
+  m_Center: {x: 5, y: -17, z: 34}
 --- !u!1001 &2103103190
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -6,8 +6,8 @@ public class EnemySpawner1 : MonoBehaviour
     public GameObject enemyPrefab;     // اسحب prefab العدو هنا
     public int maxEnemies = 6;
     public string enemyTag = "Enemy";
-    public float firstDelay = 1.5f;
-    public float every = 2f;
+    public float firstDelay = 5f;
+    public float every = 4f;
 
     void Start() => StartCoroutine(Loop());
 

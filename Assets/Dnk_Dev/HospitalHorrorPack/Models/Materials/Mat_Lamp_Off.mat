@@ -9,25 +9,22 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Mat_Lamp_Off
   m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
-  m_Parent: {fileID: 2100000, guid: 80cb81cea798afb43987837e11469c6f, type: 2}
+  m_Parent: {fileID: 2100000, guid: 5185afe064a3d8541a43d014b7ed46ba, type: 2}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
-  - _ALPHAPREMULTIPLY_ON
   - _EMISSION
   - _METALLICSPECGLOSSMAP
   - _NORMALMAP
-  - _SURFACE_TYPE_TRANSPARENT
+  - _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap:
-    RenderType: Transparent
+    RenderType: Opaque
   disabledShaderPasses:
   - MOTIONVECTORS
-  - DepthOnly
-  - SHADOWCASTER
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3

@@ -6,7 +6,13 @@ public class EnemyChase : MonoBehaviour
     public float speed = 3f;
     public float stopDistance = 1.5f;
     public string playerTag = "Player";
-    public int damage = 1; // كم ينقص من اللاعب
+    public int damage = 1;
+
+    // 🔊 الصوت
+    public AudioSource zombieSound;
+    public float soundDistance = 8f; 
+    public float soundDelay = 2f;    
+    private float nextSoundTime = 0f;
 
     private Rigidbody rb;
     private Transform target;
@@ -36,6 +42,17 @@ public class EnemyChase : MonoBehaviour
         Vector3 toPlayer = target.position - transform.position;
         toPlayer.y = 0f;
 
+        // 🔊 يشغل الصوت إذا الزومبي قريب
+        float dist = toPlayer.magnitude;
+        if (dist <= soundDistance && Time.time >= nextSoundTime)
+        {
+            if (zombieSound != null && !zombieSound.isPlaying)
+            {
+                zombieSound.Play();
+            }
+            nextSoundTime = Time.time + soundDelay;
+        }
+
         if (toPlayer.sqrMagnitude <= stopDistance * stopDistance)
         {
             rb.linearVelocity = Vector3.zero;
@@ -46,7 +63,6 @@ public class EnemyChase : MonoBehaviour
         rb.linearVelocity = toPlayer.normalized * speed;
     }
 
-    // ✅ يضرب اللاعب وينقص قلبه ويختفي
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag(playerTag))
@@ -57,7 +73,7 @@ public class EnemyChase : MonoBehaviour
                 player.TakeDamage(damage, transform.position);
             }
 
-            Destroy(gameObject); // حذف العدو بعد الضربة
+            Destroy(gameObject);
         }
     }
 }

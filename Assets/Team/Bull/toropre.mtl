@@ -1,0 +1,4 @@
+# Exported from Nomad Sculpt
+
+newmtl Default
+ map_Kd 3DModel_obj/3DModel.jpg

@@ -1,8 +1,13 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;   // مهم لإعادة تشغيل اللعبة
+using UnityEngine.UI;                // لو بتستخدم Button
 
 public class PlayerLose : MonoBehaviour
 {
-    [SerializeField] private GameObject losePanel;   // اختياري: سيجده تلقائيًا لو فاضي
+    [SerializeField] private GameObject losePanel;   // panel الخسارة
+    [SerializeField] private GameObject backgroundPanel; // الخلفية السوداء
+    [SerializeField] private Button restartButton;   // زر إعادة التشغيل
+
     [SerializeField] private string enemyTag = "Enemy";
     [SerializeField] private bool pauseOnLose = true;
 
@@ -10,6 +15,7 @@ public class PlayerLose : MonoBehaviour
     {
         Time.timeScale = 1f;
 
+        // ========== البحث التلقائي عن اللوحات ==========
         if (losePanel == null)
         {
             var byTag = GameObject.FindGameObjectWithTag("LosePanelUI");
@@ -17,40 +23,54 @@ public class PlayerLose : MonoBehaviour
             else losePanel = GameObject.Find("LosePanel");
         }
 
-        if (losePanel != null)
+        if (backgroundPanel == null)
+            backgroundPanel = GameObject.Find("LoseBackground");
+
+        if (restartButton == null)
         {
-            losePanel.SetActive(false);
-            Debug.Log("[Lose] Found panel: " + losePanel.name + " (hidden at start)");
+            var btn = GameObject.Find("RestartButton");
+            if (btn != null) restartButton = btn.GetComponent<Button>();
         }
-        else
-        {
-            Debug.LogWarning("[Lose] No LosePanel assigned/found!");
-        }
+
+        // ========== إخفاء الأشياء عند البداية ==========
+        if (losePanel != null) losePanel.SetActive(false);
+        if (backgroundPanel != null) backgroundPanel.SetActive(false);
+
+        if (restartButton != null)
+            restartButton.onClick.AddListener(RestartGame);
     }
 
     void ShowLose(string via)
     {
         Debug.Log("[Lose] YOU LOST via: " + via);
+
+        if (backgroundPanel != null) backgroundPanel.SetActive(true);
         if (losePanel != null) losePanel.SetActive(true);
+
         if (pauseOnLose) Time.timeScale = 0f;
     }
 
-    // 1) لو العدو Trigger
+    // =================== الاصطدام ===================
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag(enemyTag)) ShowLose("OnTriggerEnter");
+        if (other.CompareTag(enemyTag)) ShowLose("Trigger");
     }
 
-    // 2) لو تصادم فيزيائي عادي (Rigidbodies/Colliders)
     void OnCollisionEnter(Collision other)
     {
-        if (other.collider.CompareTag(enemyTag)) ShowLose("OnCollisionEnter");
+        if (other.collider.CompareTag(enemyTag)) ShowLose("Collision");
     }
 
-    // 3) خاص بالـ CharacterController
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
         if (hit.collider != null && hit.collider.CompareTag(enemyTag))
-            ShowLose("OnControllerColliderHit");
+            ShowLose("ControllerHit");
+    }
+
+    // =================== restart function ===================
+    public  void RestartGame()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name); // يعيد نفس المشهد
     }
 }

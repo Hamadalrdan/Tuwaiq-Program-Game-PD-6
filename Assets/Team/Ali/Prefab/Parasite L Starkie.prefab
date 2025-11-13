@@ -10,15 +10,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 859d4a1d474a4417fabf4f2a36200085, type: 3}
       propertyPath: m_LocalScale.x
-      value: 2.5
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 859d4a1d474a4417fabf4f2a36200085, type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.5
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 859d4a1d474a4417fabf4f2a36200085, type: 3}
       propertyPath: m_LocalScale.z
-      value: 2.5
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 859d4a1d474a4417fabf4f2a36200085, type: 3}
       propertyPath: m_LocalPosition.x
@@ -159,7 +159,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.2, y: 2.5, z: 1.2}
+  m_Size: {x: 1, y: 3, z: 2}
   m_Center: {x: 0, y: 1.2, z: 0}
 --- !u!114 &5487559654538790069
 MonoBehaviour:
@@ -223,7 +223,7 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 6.253597
+  MinDistance: 7.179142
   MaxDistance: 500
   Pan2D: 0
   rolloffMode: 0
@@ -318,7 +318,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 4, y: 5, z: 4}
+  m_Size: {x: 1, y: 2, z: 2}
   m_Center: {x: 0, y: 2, z: 0}
 --- !u!114 &-3245489287310554368
 MonoBehaviour:
@@ -332,7 +332,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e800b708443ed49fdb2f42f67d151e3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  zombieSound: {fileID: -2044582126408181467}
 --- !u!1 &3918336551878813378 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -5958552438806032170, guid: 859d4a1d474a4417fabf4f2a36200085, type: 3}

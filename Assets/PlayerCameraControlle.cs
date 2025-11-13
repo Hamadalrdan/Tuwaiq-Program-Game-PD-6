@@ -3,8 +3,8 @@ using UnityEngine;
 public class PlayerCameraController : MonoBehaviour
 {
     [Header("References")]
-    public Transform player;       // ÇááÇÚÈ
-    public Transform cameraPivot;  // äŞØÉ ÇáßÇãíÑÇ (ÚÇÏÉ Êßæä ÇáÑÃÓ)
+    public Transform player;       // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    public Transform cameraPivot;  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½)
 
     [Header("Mouse Settings")]
     public float mouseSensitivity = 120f;
@@ -12,23 +12,21 @@ public class PlayerCameraController : MonoBehaviour
     public Vector2 pitchLimits = new Vector2(-60, 80);
 
     [Header("Camera Distance")]
-    public float distance = 3f;     // ÈÚÏ ÇáßÇãíÑÇ Úä ÇáÑÃÓ
-    public float shoulderOffsetX = 0.5f; // ÅÒÇÍÉ ÇáßÊİ (ÇÎÊíÇÑí)
+    public float distance = 3f;     // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
+    public float shoulderOffsetX = 0.5f; // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
     public float shoulderOffsetY = 0.2f;
 
     [Header("Player Rotation")]
-    public float playerTurnSmooth = 8f; // ÓÑÚÉ ÇáÊİÇİ ÇááÇÚÈ ÚäÏ ÇáãÔí İŞØ
-    public KeyCode recenterKey = KeyCode.Q; // ÒÑ áÅÚÇÏÉ ÇáßÇãíÑÇ Îáİ ÇááÇÚÈ
+    public float playerTurnSmooth = 8f; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+    public KeyCode recenterKey = KeyCode.Q; // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-    private float yaw;   // ÏæÑÇä ÃİŞí (íãíä/íÓÇÑ)
-    private float pitch; // ÏæÑÇä ÑÃÓí (İæŞ/ÊÍÊ)
+    private float yaw;   // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½)
+    private float pitch; // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½)
     private Vector3 currentRotation;
     private Vector3 rotationSmoothVelocity;
 
     void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
 
         if (cameraPivot == null)
             cameraPivot = player;
@@ -42,7 +40,7 @@ public class PlayerCameraController : MonoBehaviour
     {
         if (player == null) return;
 
-        // --- 1) ÇáÊŞÇØ ÍÑßÉ ÇáãÇæÓ ---
+        // --- 1) ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ---
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = Input.GetAxis("Mouse Y");
 
@@ -50,31 +48,31 @@ public class PlayerCameraController : MonoBehaviour
         pitch -= mouseY * mouseSensitivity * Time.deltaTime;
         pitch = Mathf.Clamp(pitch, pitchLimits.x, pitchLimits.y);
 
-        // --- 2) ÊØÈíŞ ÇáÏæÑÇä Úáì ÇáßÇãíÑÇ (ÈÍÑíÉ ßÇãáÉ) ---
+        // --- 2) ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½) ---
         Vector3 targetRotation = new Vector3(pitch, yaw);
         currentRotation = Vector3.SmoothDamp(currentRotation, targetRotation,
                                              ref rotationSmoothVelocity, 1f / rotationSmooth);
         transform.eulerAngles = currentRotation;
 
-        // --- 3) ÍÓÇÈ ãæŞÚ ÇáßÇãíÑÇ Íæá ÇáÑÃÓ ---
+        // --- 3) ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ---
         Vector3 pivotPos = cameraPivot.position +
                            new Vector3(shoulderOffsetX, shoulderOffsetY, 0);
         Vector3 dir = transform.rotation * Vector3.back;
         transform.position = pivotPos - dir * distance;
 
-        // --- 4) ÌÚá ÇááÇÚÈ íÏæÑ İŞØ ÚäÏ ÇáÊÍÑß ááÃãÇã ---
+        // --- 4) ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ---
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
         Vector3 moveDir = new Vector3(h, 0, v);
 
         if (moveDir.magnitude > 0.1f)
         {
-            // İŞØ ÚäÏãÇ íÊÍÑß¡ ÇááÇÚÈ íáÊİ äÍæ ÇáßÇãíÑÇ (Yaw İŞØ)
+            // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ß¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ (Yaw ï¿½ï¿½ï¿½)
             Quaternion targetRot = Quaternion.Euler(0, yaw, 0);
             player.rotation = Quaternion.Slerp(player.rotation, targetRot, Time.deltaTime * playerTurnSmooth);
         }
 
-        // --- 5) ÅÚÇÏÉ ÇáßÇãíÑÇ Îáİ ÇááÇÚÈ ÈÒÑ (ÇÎÊíÇÑí) ---
+        // --- 5) ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½) ---
         if (Input.GetKeyDown(recenterKey))
         {
             yaw = player.eulerAngles.y;

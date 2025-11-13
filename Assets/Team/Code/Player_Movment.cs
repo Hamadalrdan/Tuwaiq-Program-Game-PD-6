@@ -130,15 +130,20 @@ public class Player_Movment : MonoBehaviour
         bool canControl = !isDead && hitStunTimer <= 0f;
 
         float x = 0f, z = 0f;
+
+        //
+        float moveX = Input.GetAxis("Horizontal");
+        float movey = Input.GetAxis("Vertical");
+
+        Vector3 inputMove = Vector3.zero;
+
+
         if (canControl)
         {
-            if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) x = 1f;
-            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))  x = -1f;
-            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))    z = 1f;
-            if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))  z = -1f;
+            inputMove = moveX * transform.right + movey * transform.forward;
+            inputMove *= moveSpeed;
         }
 
-        Vector3 inputMove = new Vector3(x, 0f, z).normalized * moveSpeed;
 
         if (cc.isGrounded)
         {
